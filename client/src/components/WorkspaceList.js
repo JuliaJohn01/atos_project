@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Container, Typography, Card, CardContent, Grid, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import useWorkspaceList from '../Hooks/useworkspaceList'; // Import your custom hook
+import useWorkspaceList from '../Hooks/useworkspaceList';
 
 const WorkspaceList = () => {
-  const { workspaces, createWorkspace, deleteWorkspace } = useWorkspaceList(); // Use custom hook
+  const { workspaces, createWorkspace, deleteWorkspace, error, loading } = useWorkspaceList();
   const [openDialog, setOpenDialog] = useState(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [workspaceToDelete, setWorkspaceToDelete] = useState(null);
@@ -39,9 +39,11 @@ const WorkspaceList = () => {
         startIcon={<AddIcon />}
         onClick={() => setOpenDialog(true)}
         sx={{ mb: 2 }}
-      >
+        >
         Add Workspace
       </Button>
+        {loading && <Typography>Loading...</Typography>}
+        {error && <Typography color="error">{error}</Typography>}
       <Grid container spacing={2}>
         {workspaces.map(workspace => (
           <Grid item xs={12} sm={6} md={4} key={workspace._id}>

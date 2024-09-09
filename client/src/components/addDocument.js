@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
 
-const AddDocument = ({ onDocumentAdded, closeDialog }) => {
-  const { workspaceId } = useParams();
+const AddDocument = ({ createDocument, workspaceId, onDocumentAdded, closeDialog }) => {
   const [documentName, setDocumentName] = useState('');
   const [tags, setTags] = useState('');
   const [file, setFile] = useState(null);
@@ -30,21 +27,8 @@ const AddDocument = ({ onDocumentAdded, closeDialog }) => {
       formData.append('tags', tags);                // Tags
       formData.append('file', file);                // File itself
 
-      const token = localStorage.getItem('authToken');
-
-      const axiosInstance = axios.create({
-        baseURL: 'http://localhost:5000',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const response = await axiosInstance.post(`/documents/${workspaceId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      // Use the passed createDocument function from parent
+      const response = await createDocument(formData, workspaceId);
 
       onDocumentAdded(response.data); // Notify parent about the new document
       setDocumentName('');            // Reset fields

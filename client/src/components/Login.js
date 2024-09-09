@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Container, TextField, Button, Typography, Paper, Box } from "@mui/material";
 import useLogin from '../Hooks/useLogin';
 
+import { useAuth } from '../context/AuthContext';
+
 const Login = () => {
+  const { loginUser } = useAuth();
   const { login, errors, loading } = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,6 +13,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await login(email, password);
+    await loginUser({email, password})
   };
 
   return (

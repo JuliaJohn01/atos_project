@@ -1,34 +1,20 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Typography, Card, CardContent, Grid, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
-import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { Container, Typography, Card, CardContent, Grid, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from '@mui/material';
+import { Delete as DeleteIcon, Add as AddIcon, Visibility as VisibilityIcon, Download as DownloadIcon } from '@mui/icons-material';
 import useDocumentList from '../Hooks/useDocumentList'; // Import your custom hook
-import AddDocument from './addDocument';
+import AddDocument from './addDocument'; // Import AddDocument
 
 const DocumentList = () => {
-  const { workspaceId } = useParams();
-  const { documents, createDocument, deleteDocument } = useDocumentList(workspaceId);
+  const { workspaceId } = useParams(); // Assuming you're getting workspaceId here
+  const { documents, createDocument, deleteDocument, downloadDocument, previewDocument } = useDocumentList(workspaceId); // Fetch the document list and functions
   const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [newDocumentName, setNewDocumentName] = useState('');
   const [documentToDelete, setDocumentToDelete] = useState(null);
-
-  const handleAddDocument = async () => {
-    if (!newDocumentName.trim()) {
-      alert('Document name is required');
-      return;
-    }
-    try {
-      await createDocument(newDocumentName);
-      setOpenAddDialog(false);
-      setNewDocumentName('');
-    } catch (error) {
-      console.error('Error adding document:', error);
-    }
-  };
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleDocumentAdded = (newDocument) => {
-    // Handle newly added document
-    console.log('documentADded')
+    // Handle the addition of a new document (log or state updates)
+    console.log('New document added:', newDocument);
   };
 
   const handleDeleteDocument = async (documentId) => {
@@ -37,6 +23,23 @@ const DocumentList = () => {
       setDocumentToDelete(null);
     } catch (error) {
       console.error('Error deleting document:', error);
+    }
+  };
+
+  const handleDownloadDocument = async (documentId) => {
+    try {
+      await downloadDocument(documentId);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+    }
+  };
+
+  const handlePreviewDocument = async (documentId) => {
+    try {
+      const url = await previewDocument(documentId);
+      setPreviewUrl(url);
+    } catch (error) {
+      console.error('Error previewing document:', error);
     }
   };
 
@@ -68,6 +71,24 @@ const DocumentList = () => {
                 >
                   View Details
                 </Button>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => handlePreviewDocument(document._id)}
+                  startIcon={<VisibilityIcon />}
+                  sx={{ mr: 1 }}
+                >
+                  Preview
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => handleDownloadDocument(document._id)}
+                  startIcon={<DownloadIcon />}
+                  sx={{ mr: 1 }}
+                >
+                  Download
+                </Button>
                 <IconButton
                   color="error"
                   onClick={() => setDocumentToDelete(document._id)}
@@ -82,19 +103,14 @@ const DocumentList = () => {
       <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)}>
         <DialogTitle>Add New Document</DialogTitle>
         <DialogContent>
+          {/* Pass createDocument and workspaceId as props */}
           <AddDocument 
+            createDocument={createDocument} 
+            workspaceId={workspaceId} // Passing workspaceId as it's needed in the API request
             onDocumentAdded={handleDocumentAdded} 
-            closeDialog={() => setOpenAddDialog(false)} // Function to close dialog
+            closeDialog={() => setOpenAddDialog(false)} // Close dialog on document addition
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenAddDialog(false)} color="primary">
-            Cancel
-          </Button>
-          {/* <Button onClick={handleAddDocument} color="primary">
-            Add
-          </Button> */}
-        </DialogActions>
       </Dialog>
       <Dialog
         open={!!documentToDelete}
@@ -116,6 +132,23 @@ const DocumentList = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      {previewUrl && (
+        <Dialog open={!!previewUrl} onClose={() => setPreviewUrl(null)} maxWidth="md" fullWidth>
+          <DialogTitle>Document Preview</DialogTitle>
+          <DialogContent>
+            <iframe 
+              src={previewUrl}
+              title="Document Preview"
+              style={{ width: '100%', height: '500px' }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setPreviewUrl(null)} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Container>
   );
 };

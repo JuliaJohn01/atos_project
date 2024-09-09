@@ -2,11 +2,11 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import SignUp from "./components/signup";
-import SignUp2 from "./components/SignUp/SignUp2";
 import Home from "./components/Home/home"; // Import the Home component
 import ButtonAppBar from "./components/MainAppBar";
 import WorkspaceList from "./components/WorkspaceList";
 import WorkspaceDetails from "./components/workspaceDetails"
+import { useAuth } from "./context/AuthContext";
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
@@ -23,21 +23,21 @@ const theme = createTheme({
 });
 
 function App() {
+  const { isAuthenticated } = useAuth(); // Get the user from the context
+
   return (
     <ThemeProvider theme={theme}>
-
-    <BrowserRouter>
-    {/* <ButtonAppBar /> */}
-    <Routes>
-      <Route path="/" element={<Home />} />{" "}
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/workspaces" element={<WorkspaceList />} />
-      <Route path="/workspace/:workspaceId" element={<WorkspaceDetails />} />
-      </Routes>
-    </BrowserRouter>
+      <BrowserRouter>
+        {isAuthenticated && <ButtonAppBar />}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/workspaces" element={<WorkspaceList />} />
+          <Route path="/workspace/:workspaceId" element={<WorkspaceDetails />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
-
   );
 }
 

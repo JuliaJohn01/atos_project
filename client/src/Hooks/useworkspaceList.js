@@ -1,22 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { useWorkSpaces } from '../context/workSpaceContext';
+import axiosInstance from '../services/axiosInstance';
 
 const useWorkspaceList = () => {
   const { workspaces, setWorkspaces, addWorkspace, removeWorkspace } = useWorkSpaces();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const token = localStorage.getItem('authToken');
-
-  const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5000',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
+  
   const fetchWorkspaces = useCallback(async () => {
     setLoading(true);
     try {
@@ -64,7 +54,7 @@ const useWorkspaceList = () => {
 
   useEffect(() => {
     fetchWorkspaces();
-  }, [fetchWorkspaces]);
+  }, []);
 
   return { workspaces, loading, error, createWorkspace, updateWorkspace, deleteWorkspace };
 };
