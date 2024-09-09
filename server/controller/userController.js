@@ -1,4 +1,3 @@
-
 import jwt from 'jsonwebtoken';
 import { User } from '../models/userModel.js';
 import bcrypt from 'bcrypt';
@@ -48,14 +47,12 @@ export const signup_post = async (req, res) => {
     // Create new user if no duplication is found
     const user = await User.create({ NationalId, firstName, lastName, email, password });
     const token = createToken(user._id);
-    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-    res.status(201).json({ user: user._id });
+    res.status(201).json({ token, user: user._id });
   } catch (err) {
     const errors = handleErrors(err);
     res.status(400).json({ errors });
   }
 };
-
 
 export const login_post = async (req, res) => {
   const { email, password } = req.body;
@@ -67,13 +64,11 @@ export const login_post = async (req, res) => {
     if (!auth) throw Error('incorrect password');
 
     const token = createToken(user._id);
-    //res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.json({
       token,
-      userId: user._id,
+      user: user._id,
       email
-    })
-    res.status(200).json({ user: user._id });
+    });
   } catch (err) {
     const errors = handleErrors(err);
     res.status(400).json({ errors });

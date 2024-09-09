@@ -1,19 +1,15 @@
 import express from 'express';
-import { addWorkspace, getWorkspaceById , getAllDocumentsFromWorkspace,updateWorkspace,deleteWorkspace} from '../controller/workspaceController.js'; // Import the controller function
-import verifyToken from '../Middleware/authMiddleware.js';
-
+import verifyToken from '../Middleware/authMiddleware.js'; // Update the path as needed
+import {addWorkspace, getWorkspaceById, updateWorkspace, deleteWorkspace , getAllWorkspaces} from "../controller/workspaceController.js"
 const router = express.Router();
 
-router.use(verifyToken)
+router.use(verifyToken); // Apply middleware to all routes
 
-// Route for adding a new workspace
-router.post('/', addWorkspace);
-
-router.get('/:workspaceId', getWorkspaceById)
-router.get('/:workspaceId/documents', getAllDocumentsFromWorkspace);
-router.put('/:workspaceId', updateWorkspace);
-router.delete('/:workspaceId', deleteWorkspace);
-
-
+// Define your routes here
+router.post('/createWorkspace', addWorkspace);
+router.get('/getWorkspaceById/:workspaceId', getWorkspaceById);
+router.put('/updateWorkspace/:workspaceId', updateWorkspace);
+router.delete('/deleteWorkspace/:workspaceId', deleteWorkspace);
+router.get('/', getAllWorkspaces); // Define this function in your controller
 
 export default router;

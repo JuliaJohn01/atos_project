@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import {User} from '../models/userModel.js';
+import { User } from '../models/userModel.js';
 
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -22,39 +22,3 @@ const verifyToken = async (req, res, next) => {
 };
 
 export default verifyToken;
-
-
-
-
-
-
-
-//import { verify } from 'jsonwebtoken';
-/*import User from '../models/userModel.js';
-
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token,process.env.JWT_SECRET, async(err,user) => {
-   
-
-  //verify(token, 'your_secret_key', async (err, user) => {
-    if (err) return res.sendStatus(403);
-try{
-  const findUser = await User.findById(user.id);
-  if(!findUser) return res.sendStatus(404);
-  req.user = findUser;
-      next();
-    } catch (err) {
-      console.error('Unable to Retrieve User Data:', err);
-      res.sendStatus(500);
-}
-  }); 
-}; 
-
-export default verifyToken; */
-
-

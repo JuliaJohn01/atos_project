@@ -1,18 +1,19 @@
 import React from "react";
 import { createRoot } from "react-dom/client"; // Updated import for React 18
-import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import { AuthProvider } from "./Frontend/context/AuthContext"; // Adjust the path as necessary
+import { AuthProvider } from './context/AuthContext';
+import { WorkSpaceProvider } from './context/workSpaceContext';
 
 const container = document.getElementById("root");
 const root = createRoot(container); // Create a root using React 18's API
 
 root.render(
+
   <React.StrictMode>
     <AuthProvider>
-      <BrowserRouter>
+    <WorkSpaceProvider> 
         <App />
-      </BrowserRouter>
+    </WorkSpaceProvider>
     </AuthProvider>
   </React.StrictMode>
 );

@@ -3,22 +3,16 @@ import Document from '../models/Document.js';
 
 // Controller function to add a new workspace
 export const addWorkspace = async (req, res) => {
-  const { name } = req.body; // Destructure the name from the request body
-
   try {
-    // Create a new workspace using the model
-    const newWorkspace = await Workspace.create({ name });
-
-    // Send back the newly created workspace in the response
-    res.status(201).json(newWorkspace);
-  } catch (err) {
-    console.error('Error adding workspace:', err);
-
-
-    // Send a generic error response
-    res.status(500).json({ error: 'Failed to add workspace' });
+    const { name } = req.body; // Assuming the workspace name is sent in the request body
+    const newWorkspace = new Workspace({ name }); // Assuming you have a Workspace model
+    await newWorkspace.save();
+    res.status(201).json(newWorkspace); // Respond with the newly created workspace
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to create workspace' });
   }
 };
+
 
 export const getWorkspaceById = async (req, res) => {
   const workspaceId = req.params.workspaceId;
@@ -59,7 +53,7 @@ export const updateWorkspace = async (req, res) => {
     res.status(200).json({ message: 'Workspace updated successfully', workspace: updateWorkspace });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: `Failed to update workspace, ${error}` });
+    res.status(500).json({ errors: `Failed to update workspace, ${error}` });
   }
 };
 
@@ -79,6 +73,15 @@ export const deleteWorkspace = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Failed to delete workspace' });
+  }
+};
+
+export const getAllWorkspaces = async (req, res) => {
+  try {
+    const workspaces = await Workspace.find();  // Assuming you are using Mongoose and have a Workspace model
+    res.status(200).json(workspaces);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch workspaces" });
   }
 };
 

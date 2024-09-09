@@ -6,7 +6,9 @@ import userRouter from './routes/user.js';
 import documentsRouter from './routes/documents.js';
 import workspaceRouter from './routes/workspaceRoute.js'
 import multer from 'multer';
-
+import cors from "cors"
+import path from "path";
+import { fileURLToPath } from "url";
 // Load environment variables
 config();
 
@@ -23,6 +25,13 @@ const storage = multer.diskStorage({
   },
 });
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
