@@ -66,13 +66,13 @@ atos_project/
 
 ## 📸 Screenshots
 
-![Workspaces](./images/Workspaces)  
+![Workspaces](./images/Workspaces.png)  
 _A sleek and intuitive dashboard for managing documents._
 
-![Documents](./images/documents)  
+![Documents](./images/documents.png)  
 _A sleek and intuitive view documents._
 
-![Recycle Bin](./images/Recycle bin)  
+![Recycle Bin](./images/Recycle_Bin.png)  
 _The recycle bin feature allowing easy restoration of deleted files._
 
 ## 💻 Contributing
