@@ -25,13 +25,15 @@ const storage = multer.diskStorage({
   },
 });
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+// app.use(
+  // cors({
+  //   origin: "http://localhost:3000",
+  //   methods: ["GET", "POST", "PUT", "DELETE"],
+  //   credentials: true,
+  // })
+// );
+app.use(cors())
+
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
@@ -61,7 +63,7 @@ app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.get("/", (req, res) => {
-  res.send("index"); // Serve the index route (replace with actual logic)
+  res.send("index"); // Serve the index ro  ute (replace with actual logic)
 });
 
 app.use('/users', userRouter); // Mount user routes
@@ -83,6 +85,8 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke!'); // Handle errors gracefully
 });
+
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

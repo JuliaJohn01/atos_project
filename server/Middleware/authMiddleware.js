@@ -8,7 +8,7 @@ const verifyToken = async (req, res, next) => {
   if (!token) return res.sendStatus(401); // Unauthorized if no token is provided
 
   try {
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET); // Verify token and decode it
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify token and decode it
     const user = await User.findById(decoded.id); // Find user by ID from decoded token
 
     if (!user) return res.sendStatus(404); // Not found if user doesn't exist

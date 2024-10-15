@@ -6,6 +6,9 @@ import {
   updateDocument,
   downloadDocument,
   softDeleteDocument,
+  restoreDocument,
+  getDeletedDocuments,
+  permanentlyDeleteDocument,
   previewDocument,
   listDocumentsByWorkspace,
   listDocumentsByUserProfile,
@@ -23,6 +26,9 @@ router.use(verifyToken)
 
 // Route for searching documents
 router.get('/search', searchDocuments);
+
+// Get all soft-deleted documents (Recycle Bin)
+router.get('/deleted', getDeletedDocuments);
 
 // Route for listing documents by user profile
 router.get('/profile', listDocumentsByUserProfile);
@@ -50,6 +56,23 @@ router.get('/workspace/:workspaceId', listDocumentsByWorkspace);
 
 // Route for getting document metadata
 router.get('/:documentId/metadata', getDocumentMetadata);
+
+
+// Restore a soft-deleted document
+router.put('/:documentId/restore', restoreDocument);
+
+// Get all soft-deleted documents (Recycle Bin)
+router.get('/deleted', getDeletedDocuments);
+
+// Permanently delete a document
+router.delete('/:documentId/permanent', permanentlyDeleteDocument);
+
+// Restore a soft-deleted document
+router.put('/:documentId/restore', restoreDocument);
+
+
+// Permanently delete a document
+router.delete('/:documentId/permanent', permanentlyDeleteDocument);
 
 export default router; 
 

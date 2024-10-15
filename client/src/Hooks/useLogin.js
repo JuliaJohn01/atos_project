@@ -1,41 +1,26 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useCallback } from "react";
+import axiosInstance from "../services/axiosInstance";
+import { useAuthContext } from '../context/AuthContext';
 
-const useLogin = () => {
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const {setIsAuthenticated}= useAuth()
+export const useLogin = () => {
+  const { dispatch } = useAuthContext();
 
-  const login = async (email, password) => {
-    setLoading(true);
-    setErrors({});
+  const loginUser = useCallback(async (userData) => {
     try {
-      const response = await axios.post('http://localhost:5000/users/login', { email, password }, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await axiosInstance.post("/users/login", userData);
+      const { token, user } = response.data;
 
-      if (response.data.errors) {
-        setErrors(response.data.errors);
-      }
-      if (response.data.token) {
-        // Save the token to local storage
-        localStorage.setItem('authToken', response.data.token);
-
-        setIsAuthenticated(true)
-        
-        // Update the user state in context
-        window.location.assign('/workspaces');
-      }
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify({ token, user }));
+      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      
+      dispatch({ type: "LOGIN_SUCCESS", payload: user });
+      return true;
     } catch (error) {
-      console.error('Login error:', error);
-      setErrors({ general: 'Login failed, please try again.' });
-    } finally {
-      setLoading(false);
+      console.error("Login failed:", error);
+      dispatch({ type: "AUTH_ERROR" });
     }
-  };
+  }, [dispatch]);
 
-  return { login, errors, loading };
+  return { loginUser };
 };
-
-export default useLogin;

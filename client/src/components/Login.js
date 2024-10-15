@@ -1,55 +1,68 @@
 import React, { useState } from 'react';
-import { Container, TextField, Button, Typography, Paper, Box } from "@mui/material";
-import useLogin from '../Hooks/useLogin';
-
-import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom'; // Navigation after login
+import { useLogin } from '../Hooks/useLogin'; // Custom hook for login
+import AuthPage from './AuthPage'; // Custom auth page for layout
+import './Styles/Login.css';
 
 const Login = () => {
-  const { loginUser } = useAuth();
-  const { login, errors, loading } = useLogin();
+  const { loginUser } = useLogin();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
-    await loginUser({email, password})
+    setLoading(true);
+    setErrors({}); // Reset errors before the new login attempt
+
+    try {
+      const loginSuccess = await loginUser({ email, password });
+      if (loginSuccess) {
+        navigate('/workspaces');
+      } else {
+        setErrors({ general: "Invalid credentials, please try again." });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrors({ general: "Login failed due to server error. Please try again." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Container>
-      <Paper>
-        <Typography variant="h5">Login</Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Email"
+    <AuthPage goToPage="/signup" buttonLabel="Sign Up" sideText="Need an account?">
+      <div className="login-form login-container">
+        <form className="login-container" onSubmit={handleSubmit}>
+          <input
             type="email"
-            variant="outlined"
-            fullWidth
-            margin="normal"
+            className="form-control"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            error={!!errors.email}
-            helperText={errors.email}
+            required
+            disabled={loading}
           />
-          <TextField
-            label="Password"
+          <input
             type="password"
-            variant="outlined"
-            fullWidth
-            margin="normal"
+            className="form-control"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            error={!!errors.password}
-            helperText={errors.password}
+            required
+            disabled={loading}
           />
-          <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth>
+          <button type="submit" className="btn btn-dark" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
-          </Button>
+          </button>
         </form>
-        {errors.general && <Typography color="error">{errors.general}</Typography>}
-      </Paper>
-    </Container>
+        {errors.general && <div className="alert alert-danger" role="alert">
+          {errors.general}
+        </div>}
+      </div>
+    </AuthPage>
   );
 };
 

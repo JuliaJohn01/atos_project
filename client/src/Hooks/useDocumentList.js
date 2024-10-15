@@ -7,6 +7,7 @@ const useDocumentList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { workspaceId } = useParams();
+  const [deletedDocuments, setDeletedDocuments] = useState([]);
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -39,16 +40,52 @@ const useDocumentList = () => {
   };
   
 
-  const deleteDocument = async (documentId) => {
+  
+
+  const fetchDeletedDocuments = useCallback(async () => {
     try {
-      await axiosInstance.delete(`/documents/${documentId}`);
-      setDocuments(documents.filter(document => document._id !== documentId));
+      const response = await axiosInstance.get(`/documents/deleted`);
+      console.log(response)
+      setDeletedDocuments(response.data);
     } catch (error) {
-      console.error('Error deleting document:', error);
-      setError('Failed to delete document');
+      console.error('Error fetching deleted documents:', error);
+      setError('Failed to fetch deleted documents');
+    }
+  }, []);
+
+  const softDeleteDocument = async (documentId) => {
+    try {
+      await axiosInstance.delete(`/documents/${documentId}`); // Soft delete request
+      setDocuments(prevDocuments => prevDocuments.filter(document => document._id !== documentId));
+      await fetchDeletedDocuments(); // Refresh deleted documents list
+    } catch (error) {
+      console.error('Error soft deleting document:', error);
+      setError('Failed to soft delete document');
     }
   };
 
+  // Restore a soft-deleted document
+  const restoreDocument = async (documentId) => {
+    try {
+      await axiosInstance.put(`/documents/${documentId}/restore`);
+      setDeletedDocuments(prevDeleted => prevDeleted.filter(doc => doc._id !== documentId));
+      await fetchDocuments(); // Refresh active documents list
+    } catch (error) {
+      console.error('Error restoring document:', error);
+      setError('Failed to restore document');
+    }
+  };
+
+  // Permanently delete a document
+  const permanentlyDeleteDocument = async (documentId) => {
+    try {
+      await axiosInstance.delete(`/documents/${documentId}/permanent`);
+      setDeletedDocuments(prevDeleted => prevDeleted.filter(doc => doc._id !== documentId));
+    } catch (error) {
+      console.error('Error permanently deleting document:', error);
+      setError('Failed to permanently delete document');
+    }
+  };
 
   const downloadDocument = async (documentId) => {
     try {
@@ -79,12 +116,43 @@ const useDocumentList = () => {
     }
   };
 
+  const searchDocuments = async (query) => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(`/documents/search?query=${query}`);
+      setDocuments(response.data);
+    } catch (error) {
+      console.error('Error searching documents:', error);
+      setError('Failed to search documents');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteDocument = async (documentId) => {
+    try {
+      await axiosInstance.delete(`/documents/${documentId}`);
+      setDocuments(prevDocuments => prevDocuments.filter(document => document._id !== documentId));
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      setError('Failed to delete document');
+    }
+  };
+
+
 
   useEffect(() => {
-    fetchDocuments();
-  }, []);
+    if (workspaceId) {
+      fetchDocuments();
+    }
+  }, [fetchDocuments, workspaceId]);
 
-  return { documents, loading, error, createDocument, deleteDocument, downloadDocument, previewDocument };
+  useEffect(() => {
+    fetchDeletedDocuments();
+  }, [fetchDeletedDocuments]);
+
+  return { documents, loading, error, createDocument, deleteDocument, downloadDocument, previewDocument, softDeleteDocument,
+    restoreDocument, permanentlyDeleteDocument,searchDocuments, deletedDocuments};
 };
 
-export default useDocumentList;
+export default useDocumentList; 

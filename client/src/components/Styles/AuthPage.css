@@ -1,0 +1,23 @@
+.atos-image{
+  background-image:  url("background.jpg")  ;
+  background-repeat: no-repeat;
+  background-size: cover;
+ 
+}
+.auth-container {
+    height: 100vh; /* Full viewport height */
+  }
+  
+  .auth-side-text {
+    /* background-color: #5c67f2;  */
+    color: white; /* White text */
+  }
+  
+  .full-height {
+    height: 100%;
+  }
+
+  .extra-top {
+    margin-top: 200px;
+  }
+  
